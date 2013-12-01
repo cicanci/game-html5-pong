@@ -3,37 +3,37 @@
     <head>
         <meta charset="UTF-8" />
         <title>HTML5 - Canvas API</title>
-		<style type="text/css">
-			canvas {
-			  border:1px dashed #000000;
-			}
-		</style>
+                <style type="text/css">
+                        canvas {
+                          border:1px dashed #000000;
+                        }
+                </style>
     </head>   
     <body onload="init()">
-		<canvas id="canvas" width="600" height="480">
-			Navegador não compatível com HTML5 Canvas
-		</canvas>
+                <canvas id="canvas" width="600" height="480">
+                        Navegador não compatível com HTML5 Canvas
+                </canvas>
         <script>
             // Variáveis globais utilizadas no jogo
-            var canvas, context, barraWidth, barraHeight, jogadorPosX, jogadorPosY, jogadorParaCima, jogadorMove, oponentePosX, 
-                   oponentePosY, oponenteParaCima, bolaDiametro, bolaPosX, bolaPosY, bolaParaDireita, bolaAngulo, bolaTempo,
+            var canvas, context, barraWidth, barraHeight, jogadorPosX, jogadorPosY, teclaCimaPressionada, teclaBaixoPressionada, oponentePosX, 
+                   oponentePosY, oponenteParaCima, bolaRaio, bolaPosX, bolaPosY, bolaParaDireita, bolaAngulo, bolaTempo,
                    velocidadeJogador, velocidadeOponente, velocidadeBola, pontosJogador, pontosOponente;
             
             // Método para iniciar o jogo, executado no onload da tag body
-			function init() {
-				canvas = document.getElementById("canvas");// procura o canvas
-	            context = canvas.getContext("2d");// recupera o contexto 2d
+                        function init() {
+                                canvas = document.getElementById("canvas");// procura o canvas
+                    context = canvas.getContext("2d");// recupera o contexto 2d
 
-	            barraWidth = 30;
-	            barraHeight = 90;
-	            jogadorPosX = 0;
-	            jogadorPosY = (canvas.height - barraHeight) / 2;
-	            jogadorParaCima = false;
-	            jogadorMove = false;
-	            oponentePosX = canvas.width - barraWidth;
-	            oponentePosY = 0;
-	            oponenteParaCima = false;
-                bolaDiametro = 10;
+                    barraWidth = 30;
+                    barraHeight = 90;
+                    jogadorPosX = 0;
+                    jogadorPosY = (canvas.height - barraHeight) / 2;
+                    teclaCimaPressionada = false;
+                    teclaBaixoPressionada = false;
+                    oponentePosX = canvas.width - barraWidth;
+                    oponentePosY = 0;
+                    oponenteParaCima = false;
+                bolaRaio = 10;
                 bolaPosX = canvas.width / 2;
                 bolaPosY = canvas.height / 2;
                 bolaParaDireita = false;
@@ -44,62 +44,65 @@
                 velocidadeBola = 15;
                 pontosJogador = 0;
                 pontosOponente = 0;
-	            
-	            document.addEventListener('keyup', keyUp, false);// adiciona evento para keyup
-	            document.addEventListener('keydown', keyDown, false);// adiciona evento para keydown
-				setInterval(gameLoop, 30);// chama a function gameLoop a cada 30 frames
-			}
+                    
+                    document.addEventListener('keyup', keyUp, false);// adiciona evento para keyup
+                    document.addEventListener('keydown', keyDown, false);// adiciona evento para keydown
+                                setInterval(gameLoop, 30);// chama a function gameLoop a cada 30 frames
+                        }
             
-			function keyDown(e) {
-				if (e.keyCode == 38) { // up
-					jogadorParaCima = true;
-					jogadorMove = true;// jogador está se movimentando (somente quando pressiona up ou down)
-				}
-				else if (e.keyCode == 40) { // down
-					jogadorParaCima = false;
-					jogadorMove = true;// jogador está se movimentando (somente quando pressiona up ou down)
-				}
-			}
-			
-			function keyUp(e) {
-				jogadorMove = false; //jogador está parado
-			}
-			
-			function gameLoop() {
+                        function keyDown(e) {
+                                if (e.keyCode == 38) { // up
+                                        teclaCimaPressionada = true;
+                                }
+                                else if (e.keyCode == 40) { // down
+                                        teclaBaixoPressionada = true;
+                                }
+                        }
+                        
+                        function keyUp(e) {
+                                if (e.keyCode == 38) { // up
+                                        teclaCimaPressionada = false; // jogador soltou tecla cima
+                                }
+                                else if (e.keyCode == 40) { // down
+                                        teclaBaixoPressionada = false; // jogador soltou tecla baixo
+                                }
+                        }
+                        
+                        function gameLoop() {
                 // Jogador
-				if (jogadorMove) {// se o jogador estiver se movimentando...
-					if (jogadorParaCima) { // se for para cima...
-						if (jogadorPosY > 0) { // se não sair da tela...
-							jogadorPosY -= velocidadeJogador;// muda a posição
-						}
-					}
-					else { // se for para baixo...
-						if (jogadorPosY < (canvas.height - barraHeight)) {// se não sair da tela...
-							jogadorPosY += velocidadeJogador;// muda a posição
-						}
-					}
-				}
+                                if (teclaCimaPressionada!=teclaBaixoPressionada) { // se o jogador estiver pressionando a tecla baixo ou cima
+                                        if (teclaCimaPressionada) { // se for para cima...
+                                                if (jogadorPosY > 0) { // se não sair da tela...
+                                                        jogadorPosY -= velocidadeJogador;// muda a posição
+                                                }
+                                        }
+                                        else { // se for para baixo...
+                                                if (jogadorPosY < (canvas.height - barraHeight)) {// se não sair da tela...
+                                                        jogadorPosY += velocidadeJogador;// muda a posição
+                                                }
+                                        }
+                                }
 
                 // Oponente
-				if (oponenteParaCima) {// se o oponente estiver se movendo para cima...
-					oponentePosY -= velocidadeOponente;// muda a posição
-					if (oponentePosY <= 0) {// se estiver saindo da tela...
-						oponenteParaCima = false;// muda a direção
-					}
-				}
-				else {// se o oponente estiver se movendo para baixo...
-					oponentePosY += velocidadeOponente;// muda a posição
-					if (oponentePosY >= canvas.height - barraHeight) {// se estiver saindo da tela...
-						oponenteParaCima = true;// muda a direção
-					}
-				}
+                                if (oponenteParaCima) {// se o oponente estiver se movendo para cima...
+                                        oponentePosY -= velocidadeOponente;// muda a posição
+                                        if (oponentePosY <= 0) {// se estiver saindo da tela...
+                                                oponenteParaCima = false;// muda a direção
+                                        }
+                                }
+                                else {// se o oponente estiver se movendo para baixo...
+                                        oponentePosY += velocidadeOponente;// muda a posição
+                                        if (oponentePosY >= canvas.height - barraHeight) {// se estiver saindo da tela...
+                                                oponenteParaCima = true;// muda a direção
+                                        }
+                                }
 
                 // Bola
                 if (bolaTempo <= 0) {// se a bola estiver em jogo, o tempo é zero (após marcar ponto, a bola fica invisível por um tempo)
-                    if ((bolaPosX - 10) <= (jogadorPosX + barraWidth)) {// se o jogador enconstar na bola (eixo X)...
-                        if ((bolaPosY + 10 > jogadorPosY) && (bolaPosY - 10 < jogadorPosY + barraHeight)) {// se o jogador enconstar na bola (eixo Y)...
+                    if ((bolaPosX - bolaRaio) <= (jogadorPosX + barraWidth)) {// se o jogador enconstar na bola (eixo X)...
+                        if ((bolaPosY + bolaRaio > jogadorPosY) && (bolaPosY - bolaRaio < jogadorPosY + barraHeight)) {// se o jogador enconstar na bola (eixo Y)...
                             bolaParaDireita = true;// a bola muda de lado e é rebatida para o oponente
-                            if (jogadorParaCima) {// se o jogador estiver indo para cima quando tocar na bola...
+                            if (teclaCimaPressionada) {// se o jogador estiver indo para cima quando tocar na bola...
                                 bolaAngulo = Math.floor(Math.random() * 10) - 9;// mandamos a bola na diagonal pra cima
                             }
                             else {// se o jogador estiver indo para baixo quando tocar na bola...
@@ -107,8 +110,8 @@
                             }                        
                         }                    
                     }
-                    else if ((bolaPosX - 10) > (oponentePosX - barraWidth)) {// se o oponente enconstar na bola (eixo X)...
-                        if ((bolaPosY + 10 > oponentePosY) && (bolaPosY - 10 < oponentePosY + barraHeight)) {// se o oponente enconstar na bola (eixo Y)...
+                    else if ((bolaPosX + bolaRaio) >= oponentePosX) {// se o oponente enconstar na bola (eixo X)...
+                        if ((bolaPosY + bolaRaio > oponentePosY) && (bolaPosY - bolaRaio < oponentePosY + barraHeight)) {// se o oponente enconstar na bola (eixo Y)...
                             bolaParaDireita = false;// a bola muda de lado e é rebatida para o jogador
                             if (oponenteParaCima) {// se o oponente estiver indo para cima quando tocar na bola...
                                 bolaAngulo = Math.floor(Math.random() * 10) - 9;// mandamos a bola na diagonal pra cima
@@ -119,7 +122,7 @@
                         }
                     } 
                     
-                    if ((bolaPosY - 10 <= 0) || (bolaPosY + 10 > canvas.height)) {// se a bola bater em cima ou em baixo da tela...
+                    if ((bolaPosY - bolaRaio <= 0) || (bolaPosY + bolaRaio > canvas.height)) {// se a bola bater em cima ou em baixo da tela...
                         bolaAngulo = bolaAngulo * -1;// multiplicamos por -1 para inverter o sinal e a direção da bola no eixo Y
                     }
                     bolaPosY += bolaAngulo;// movemos a bola para cima ou para baixo, de acordo com o cáculo acima
@@ -132,9 +135,9 @@
                     }                    
                 }              
                 
-                if ((bolaPosX <= -10) || (bolaPosX > canvas.width)) {// se a bola saiu da tela...
+                if ((bolaPosX <= -bolaRaio) || (bolaPosX > canvas.width)) {// se a bola saiu da tela...
                     if (bolaTempo >= 50) {// se so tempo de deixar a bola invisível passou...
-                        if (bolaPosX <= -10)  {// se a bola saiu na esquerda...
+                        if (bolaPosX <= -bolaRaio)  {// se a bola saiu na esquerda...
                             pontosOponente++;// ponto do oponente!
                         }
                         else {// se a bola saiu na direita...
@@ -161,7 +164,7 @@
                 
                 // Bola
                 context.beginPath();// inicia o modo de desenho
-                context.arc(bolaPosX, bolaPosY, bolaDiametro, 0, Math.PI * 2, true); // desenha o círculo desejado
+                context.arc(bolaPosX, bolaPosY, bolaRaio, 0, Math.PI * 2, true); // desenha o círculo desejado com as coordenadas no centro.
                 context.closePath();// finaliza o caminho (opcional)
                 context.fill();
                 
@@ -177,8 +180,8 @@
                 }
                 
                 context.font = "42pt Helvetica";// tamanho e fonte para desenhar o texto
-			    context.fillStyle = "#000000";// cor preta (opcional)
-			    context.fillText(pontosA + " " + pontosB, (canvas.width / 2) - 70, 50); // escreve texto na tela na posição desejada
+                            context.fillStyle = "#000000";// cor preta (opcional)
+                            context.fillText(pontosA + " " + pontosB, (canvas.width / 2) - 70, 50); // escreve texto na tela na posição desejada
                 
                 // Linha divisória
                 context.beginPath();// inicia o modo de desenho
@@ -187,7 +190,7 @@
                 context.strokeStyle = "#000000";// cor preta (opcional)
                 context.stroke();// aplica o risco na tela
                 context.closePath();// finaliza o caminho (opcional)
-			}
+                        }
 
         </script>
     </body>
